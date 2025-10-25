@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Loan Options - Techspace Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+            line-height: 1.6;
+            padding: 2rem 5%;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .greeting {
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .qualification-message {
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .loan-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .loan-card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .loan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .loan-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 1rem;
+        }
+
+        .loan-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            padding: 0.5rem 0;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .btn-get-loan {
+            width: 100%;
+            padding: 1rem;
+            background: #22c55e;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            min-height: 44px;
+        }
+
+        .btn-get-loan:hover {
+            background: #16a34a;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-btn:hover {
+            color: #1f2937;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-details {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .confirmation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .confirmation-row:last-child {
+            border-bottom: none;
+        }
+
+        .confirmation-label {
+            color: #6b7280;
+        }
+
+        .confirmation-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .highlight {
+            color: #22c55e;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .notice {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+
+        .btn-cancel {
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn-cancel:hover {
+            background: #f9fafb;
+        }
+
+        .btn-confirm {
+            background: #22c55e;
+            color: #ffffff;
+        }
+
+        .btn-confirm:hover {
+            background: #16a34a;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 3%;
+            }
+
+            .loan-amount {
+                font-size: 2rem;
+            }
+
+            .loan-details {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Techspace Finance</div>
+            <h1>Available Loan Options</h1>
+            <p class="greeting">Hello, <span id="userName">Valued Customer</span>!</p>
+            <p class="qualification-message">Congratulations! You qualify for the following loan options:</p>
+        </div>
+
+        <div class="loan-cards" id="loanCards">
+        </div>
+    </div>
+
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Loan Confirmation</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="success-icon">✅</div>
+            
+            <div class="confirmation-details">
+                <div class="confirmation-row">
+                    <span class="confirmation-label">Total Loan Amount:</span>
+                    <span class="confirmation-value" id="modalLoanAmount">KES 0</span>
+                </div>
+                <div class="confirmation-row">
+                    <span class="confirmation-label">Service Fee to Pay:</span>
+                    <span class="confirmation-value highlight" id="modalServiceFee">KES 0</span>
+                </div>
+                <div class="confirmation-row">
+                    <span class="confirmation-label">Loan Disbursable to M-PESA:</span>
+                    <span class="confirmation-value" id="modalDisbursable">KES 0</span>
+                </div>
+                <div class="confirmation-row">
+                    <span class="confirmation-label">Repayment Period:</span>
+                    <span class="confirmation-value" id="modalRepayment">0 days</span>
+                </div>
+                <div class="confirmation-row">
+                    <span class="confirmation-label">Interest Rate:</span>
+                    <span class="confirmation-value" id="modalInterest">0%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="recipientNumber">Recipient Mobile Number</label>
+                <input type="tel" id="recipientNumber" placeholder="0712345678">
+            </div>
+
+            <div class="notice">
+                <strong>Important:</strong> Pay the service fee via M-PESA to receive your loan. The service fee is withdrawable upon successful completion of your first loan repayment cycle.
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                <button class="btn btn-confirm" id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userData = JSON.parse(localStorage.getItem('eligibilityData') || '{}');
+        
+        if (userData.fullName) {
+            document.getElementById('userName').textContent = userData.fullName;
+        }
+
+        const loanOptions = [
+            {
+                amount: 3500,
+                interestRate: 15,
+                serviceFee: 350,
+                repaymentPeriod: 30,
+                trackingNumber: 'TF' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            },
+            {
+                amount: 5500,
+                interestRate: 14,
+                serviceFee: 550,
+                repaymentPeriod: 45,
+                trackingNumber: 'TF' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            },
+            {
+                amount: 10000,
+                interestRate: 12,
+                serviceFee: 1000,
+                repaymentPeriod: 60,
+                trackingNumber: 'TF' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            },
+            {
+                amount: 15000,
+                interestRate: 10,
+                serviceFee: 1500,
+                repaymentPeriod: 90,
+                trackingNumber: 'TF' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            }
+        ];
+
+        const loanCardsContainer = document.getElementById('loanCards');
+
+        loanOptions.forEach((loan, index) => {
+            const disbursable = loan.amount - loan.serviceFee;
+            
+            const card = document.createElement('div');
+            card.className = 'loan-card';
+            card.innerHTML = `
+                <div class="loan-amount">KES ${loan.amount.toLocaleString()}</div>
+                <div class="loan-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Full Name</div>
+                        <div class="detail-value">${userData.fullName || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">National ID</div>
+                        <div class="detail-value">${userData.nationalId || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tracking Number</div>
+                        <div class="detail-value">${loan.trackingNumber}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Interest Rate</div>
+                        <div class="detail-value">${loan.interestRate}%</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Service Fee</div>
+                        <div class="detail-value">KES ${loan.serviceFee.toLocaleString()}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Repayment Period</div>
+                        <div class="detail-value">${loan.repaymentPeriod} days</div>
+                    </div>
+                </div>
+                <button class="btn-get-loan" onclick="openModal(${index})">Get Loan Now</button>
+            `;
+            
+            loanCardsContainer.appendChild(card);
+        });
+
+        let selectedLoan = null;
+
+        function openModal(index) {
+            selectedLoan = loanOptions[index];
+            const disbursable = selectedLoan.amount - selectedLoan.serviceFee;
+            
+            document.getElementById('modalLoanAmount').textContent = `KES ${selectedLoan.amount.toLocaleString()}`;
+            document.getElementById('modalServiceFee').textContent = `KES ${selectedLoan.serviceFee.toLocaleString()}`;
+            document.getElementById('modalDisbursable').textContent = `KES ${disbursable.toLocaleString()}`;
+            document.getElementById('modalRepayment').textContent = `${selectedLoan.repaymentPeriod} days`;
+            document.getElementById('modalInterest').textContent = `${selectedLoan.interestRate}%`;
+            document.getElementById('recipientNumber').value = userData.phoneNumber || '';
+            
+            document.getElementById('confirmationModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').classList.remove('active');
+            selectedLoan = null;
+        }
+
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            const recipientNumber = document.getElementById('recipientNumber').value.trim();
+            
+            if (!recipientNumber) {
+                alert('Please enter a valid mobile number');
+                return;
+            }
+
+            const paymentData = {
+                loan: selectedLoan,
+                recipientNumber: recipientNumber,
+                userData: userData
+            };
+
+            localStorage.setItem('paymentData', JSON.stringify(paymentData));
+            window.location.href = 'payment-processing.html';
+        });
+
+        document.getElementById('confirmationModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('confirmationModal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+  </html>
