@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Loan Eligibility - Techspace Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+            line-height: 1.6;
+            padding: 2rem 5%;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+            background: #22c55e;
+            color: #ffffff;
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .step-label.active {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        input.error, select.error {
+            border-color: #ef4444;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+
+        .btn-back {
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn-back:hover {
+            background: #f9fafb;
+        }
+
+        .btn-next, .btn-submit {
+            background: #22c55e;
+            color: #ffffff;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
+            background: #16a34a;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-message h2 {
+            color: #22c55e;
+            margin-bottom: 1rem;
+        }
+
+        .loader {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 3%;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .step-label {
+                font-size: 0.75rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Techspace Finance</div>
+            <h1>Check Loan Eligibility</h1>
+            <p>Complete the form below to check your eligibility</p>
+        </div>
+
+        <div class="progress-indicator">
+            <div class="progress-step">
+                <div class="step-circle active" id="step1Circle">1</div>
+                <div class="step-label active" id="step1Label">Personal Details</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-circle" id="step2Circle">2</div>
+                <div class="step-label" id="step2Label">Additional Details</div>
+            </div>
+        </div>
+
+        <form id="eligibilityForm">
+            <div class="form-step active" id="formStep1">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required>
+                    <div class="error-message" id="fullNameError">Please enter your full name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number *</label>
+                    <input type="tel" id="phoneNumber" placeholder="e.g., 0712345678" required>
+                    <div class="error-message" id="phoneNumberError">Please enter a valid phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nationalId">National ID Number *</label>
+                    <input type="text" id="nationalId" required>
+                    <div class="error-message" id="nationalIdError">National ID must be at least 8 digits</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender *</label>
+                    <select id="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="error-message" id="genderError">Please select your gender</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth *</label>
+                    <input type="date" id="dateOfBirth" required>
+                    <div class="error-message" id="dateOfBirthError">Please enter your date of birth</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" onclick="window.location.href='index.html'">Back</button>
+                    <button type="button" class="btn btn-next" id="nextBtn">Next</button>
+                </div>
+            </div>
+
+            <div class="form-step" id="formStep2">
+                <div class="form-group">
+                    <label for="county">County of Residence *</label>
+                    <input type="text" id="county" required>
+                    <div class="error-message" id="countyError">Please enter your county</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="education">Level of Education *</label>
+                    <select id="education" required>
+                        <option value="">Select Education Level</option>
+                        <option value="Primary">Primary</option>
+                        <option value="Secondary">Secondary</option>
+                        <option value="Certificate">Certificate</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Degree">Bachelor's Degree</option>
+                        <option value="Masters">Master's Degree</option>
+                        <option value="PhD">PhD</option>
+                    </select>
+                    <div class="error-message" id="educationError">Please select your education level</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="employment">Employment Status *</label>
+                    <select id="employment" required>
+                        <option value="">Select Employment Status</option>
+                        <option value="Employed">Employed</option>
+                        <option value="Self-Employed">Self-Employed</option>
+                        <option value="Student">Student</option>
+                        <option value="Unemployed">Unemployed</option>
+                    </select>
+                    <div class="error-message" id="employmentError">Please select your employment status</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="income">Monthly Income *</label>
+                    <select id="income" required>
+                        <option value="">Select Monthly Income</option>
+                        <option value="0-10000">KES 0 - 10,000</option>
+                        <option value="10001-20000">KES 10,001 - 20,000</option>
+                        <option value="20001-30000">KES 20,001 - 30,000</option>
+                        <option value="30001-50000">KES 30,001 - 50,000</option>
+                        <option value="50001-100000">KES 50,001 - 100,000</option>
+                        <option value="100000+">KES 100,000+</option>
+                    </select>
+                    <div class="error-message" id="incomeError">Please select your monthly income</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loanPurpose">Loan Purpose *</label>
+                    <select id="loanPurpose" required>
+                        <option value="">Select Loan Purpose</option>
+                        <option value="Business">Business</option>
+                        <option value="Education">Education</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="error-message" id="loanPurposeError">Please select loan purpose</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" id="backBtn">Back</button>
+                    <button type="submit" class="btn btn-submit" id="submitBtn">Submit</button>
+                </div>
+            </div>
+
+            <div class="form-step" id="successStep">
+                <div class="success-message">
+                    <div class="success-icon">✅</div>
+                    <h2>Success!</h2>
+                    <p>Your eligibility check was successful! Please wait while we redirect you to the next step.</p>
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const formData = {};
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (validateStep1()) {
+                saveStep1Data();
+                goToStep(2);
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            goToStep(1);
+        });
+
+        document.getElementById('eligibilityForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (validateStep2()) {
+                saveStep2Data();
+                submitForm();
+            }
+        });
+
+        function validateStep1() {
+            let isValid = true;
+
+            const fullName = document.getElementById('fullName').value.trim();
+            if (!fullName) {
+                showError('fullName', 'fullNameError');
+                isValid = false;
+            } else {
+                hideError('fullName', 'fullNameError');
+            }
+
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            if (!phoneNumber || phoneNumber.length < 10) {
+                showError('phoneNumber', 'phoneNumberError');
+                isValid = false;
+            } else {
+                hideError('phoneNumber', 'phoneNumberError');
+            }
+
+            const nationalId = document.getElementById('nationalId').value.trim();
+            if (!nationalId || nationalId.length < 8) {
+                showError('nationalId', 'nationalIdError');
+                isValid = false;
+            } else {
+                hideError('nationalId', 'nationalIdError');
+            }
+
+            const gender = document.getElementById('gender').value;
+            if (!gender) {
+                showError('gender', 'genderError');
+                isValid = false;
+            } else {
+                hideError('gender', 'genderError');
+            }
+
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            if (!dateOfBirth) {
+                showError('dateOfBirth', 'dateOfBirthError');
+                isValid = false;
+            } else {
+                hideError('dateOfBirth', 'dateOfBirthError');
+            }
+
+            return isValid;
+        }
+
+        function validateStep2() {
+            let isValid = true;
+
+            const county = document.getElementById('county').value.trim();
+            if (!county) {
+                showError('county', 'countyError');
+                isValid = false;
+            } else {
+                hideError('county', 'countyError');
+            }
+
+            const education = document.getElementById('education').value;
+            if (!education) {
+                showError('education', 'educationError');
+                isValid = false;
+            } else {
+                hideError('education', 'educationError');
+            }
+
+            const employment = document.getElementById('employment').value;
+            if (!employment) {
+                showError('employment', 'employmentError');
+                isValid = false;
+            } else {
+                hideError('employment', 'employmentError');
+            }
+
+            const income = document.getElementById('income').value;
+            if (!income) {
+                showError('income', 'incomeError');
+                isValid = false;
+            } else {
+                hideError('income', 'incomeError');
+            }
+
+            const loanPurpose = document.getElementById('loanPurpose').value;
+            if (!loanPurpose) {
+                showError('loanPurpose', 'loanPurposeError');
+                isValid = false;
+            } else {
+                hideError('loanPurpose', 'loanPurposeError');
+            }
+
+            return isValid;
+        }
+
+        function showError(fieldId, errorId) {
+            document.getElementById(fieldId).classList.add('error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        function hideError(fieldId, errorId) {
+            document.getElementById(fieldId).classList.remove('error');
+            document.getElementById(errorId).classList.remove('show');
+        }
+
+        function saveStep1Data() {
+            formData.fullName = document.getElementById('fullName').value.trim();
+            formData.phoneNumber = document.getElementById('phoneNumber').value.trim();
+            formData.nationalId = document.getElementById('nationalId').value.trim();
+            formData.gender = document.getElementById('gender').value;
+            formData.dateOfBirth = document.getElementById('dateOfBirth').value;
+        }
+
+        function saveStep2Data() {
+            formData.county = document.getElementById('county').value.trim();
+            formData.education = document.getElementById('education').value;
+            formData.employment = document.getElementById('employment').value;
+            formData.income = document.getElementById('income').value;
+            formData.loanPurpose = document.getElementById('loanPurpose').value;
+        }
+
+        function goToStep(stepNumber) {
+            document.getElementById('formStep1').classList.remove('active');
+            document.getElementById('formStep2').classList.remove('active');
+            
+            document.getElementById('step1Circle').classList.remove('active');
+            document.getElementById('step2Circle').classList.remove('active');
+            document.getElementById('step1Label').classList.remove('active');
+            document.getElementById('step2Label').classList.remove('active');
+
+            if (stepNumber === 1) {
+                document.getElementById('formStep1').classList.add('active');
+                document.getElementById('step1Circle').classList.add('active');
+                document.getElementById('step1Label').classList.add('active');
+            } else if (stepNumber === 2) {
+                document.getElementById('formStep2').classList.add('active');
+                document.getElementById('step2Circle').classList.add('active');
+                document.getElementById('step2Label').classList.add('active');
+            }
+
+            currentStep = stepNumber;
+        }
+
+        function submitForm() {
+            localStorage.setItem('eligibilityData', JSON.stringify(formData));
+            
+            document.getElementById('formStep2').classList.remove('active');
+            document.getElementById('successStep').classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = 'loan-options.html';
+            }, 2500);
+        }
+    </script>
+</body>
+              </html>
